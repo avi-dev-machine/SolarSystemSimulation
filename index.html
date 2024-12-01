@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar System Simulation</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: black;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .solar-system {
+            position: relative;
+            width: 1000px;
+            height: 1000px;
+        }
+
+        .sun {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, yellow, orange, red);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px yellow;
+        }
+
+        .orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 1px dotted rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .planet {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: -50% -50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .planet-body {
+            border-radius: 50%;
+        }
+
+        .planet-name {
+            position: absolute;
+            top: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: white;
+            text-align: center;
+        }
+
+        .satellite {
+            position: absolute;
+            background: gray;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="solar-system">
+        <div class="sun"></div>
+    </div>
+
+    <script>
+        const container = document.querySelector('.solar-system');
+
+        const planets = [
+            { name: 'Mercury', color: 'gray', size: 10, distance: 70, period: 88 },
+            { name: 'Venus', color: 'orange', size: 15, distance: 100, period: 225 },
+            { name: 'Earth', color: 'blue', size: 20, distance: 150, period: 365, 
+              satellites: [{ name: 'Moon', color: 'gray', size: 5, distance: 30, period: 27 }] },
+            { name: 'Mars', color: 'red', size: 15, distance: 200, period: 687 },
+            { name: 'Jupiter', color: 'brown', size: 30, distance: 300, period: 4333 },
+            { name: 'Saturn', color: 'yellow', size: 25, distance: 400, period: 10759 },
+            { name: 'Uranus', color: 'lightblue', size: 20, distance: 500, period: 30687 },
+            { name: 'Neptune', color: 'darkblue', size: 20, distance: 600, period: 60190 }
+        ];
+
+        planets.forEach(planet => {
+            // Create orbit for the planet
+            const orbit = document.createElement('div');
+            orbit.classList.add('orbit');
+            orbit.style.width = `${planet.distance * 2}px`;
+            orbit.style.height = `${planet.distance * 2}px`;
+            container.appendChild(orbit);
+
+            // Create planet element
+            const planetElement = document.createElement('div');
+            planetElement.classList.add('planet');
+            planetElement.style.width = `${planet.size}px`;
+            planetElement.style.height = `${planet.size}px`;
+
+            // Planet body
+            const planetBody = document.createElement('div');
+            planetBody.classList.add('planet-body');
+            planetBody.style.backgroundColor = planet.color;
+            planetBody.style.width = '100%';
+            planetBody.style.height = '100%';
+
+            // Planet name
+            const planetName = document.createElement('div');
+            planetName.classList.add('planet-name');
+            planetName.textContent = planet.name;
+
+            planetElement.appendChild(planetBody);
+            planetElement.appendChild(planetName);
+
+            // Add satellites if any
+            if (planet.satellites) {
+                planet.satellites.forEach(satellite => {
+                    const satelliteElement = document.createElement('div');
+                    satelliteElement.classList.add('satellite');
+                    satelliteElement.style.width = `${satellite.size}px`;
+                    satelliteElement.style.height = `${satellite.size}px`;
+                    satelliteElement.style.backgroundColor = satellite.color;
+
+                    let satelliteAngle = 0;
+
+                    function animateSatellite() {
+                        const x = Math.cos(satelliteAngle * Math.PI / 180) * satellite.distance;
+                        const y = Math.sin(satelliteAngle * Math.PI / 180) * satellite.distance;
+                        satelliteElement.style.transform = `translate(${x}px, ${y}px)`;
+
+                        satelliteAngle += 360 / satellite.period;
+                        requestAnimationFrame(animateSatellite);
+                    }
+                    animateSatellite();
+
+                    planetElement.appendChild(satelliteElement);
+                });
+            }
+
+            container.appendChild(planetElement);
+
+            // Animate planet
+            let angle = 0;
+
+            function animatePlanet() {
+                const x = Math.cos(angle * Math.PI / 180) * planet.distance;
+                const y = Math.sin(angle * Math.PI / 180) * planet.distance;
+                planetElement.style.transform = `translate(${x}px, ${y}px)`;
+
+                angle += 360 / planet.period / 10;
+                requestAnimationFrame(animatePlanet);
+            }
+            animatePlanet();
+        });
+    </script>
+</body>
+</html>
